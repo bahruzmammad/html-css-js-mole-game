@@ -1,86 +1,121 @@
-# Whack a Mole
+# Whack-a-Mole
 
-A simple Whack-a-Mole style browser game built with HTML, CSS, and JavaScript.
+A small, dependency-free browser game built with HTML, CSS and JavaScript. Click moles to score points and avoid piranha plants — the game tracks score, lives, a countdown timer, and saves the high score to localStorage.
 
-Players click on tiles to whack moles while avoiding piranha plants. The game tracks score, remaining lives, a countdown timer, and persists the high score in localStorage.
-
-## Features
-
-- Vanilla HTML/CSS/JS — no build tools required
-- 3x3 game board with clickable tiles
-- Moles appear every second, plants appear every two seconds
-- Score increases by 10 for each mole whacked
-- Clicking a plant costs a life; game ends when lives reach 0 or time runs out
-- High score saved to localStorage
-- Restart button to start a new game
+---
 
 ## Demo
 
-Open `index.html` in your browser (double-click or serve with a static file server) to play.
+Open `index.html` in your browser or serve the repository with a local static server. Example:
 
-## How to run locally
+```bash
+# clone
+git clone https://github.com/bahruzmammad/html-css-js-mole-game.git
+cd html-css-js-mole-game
 
-1. Clone the repository:
+# optional: serve with a simple static server
+npx http-server .
+# then open http://localhost:8080 in your browser
+```
 
-   git clone https://github.com/bahruzmammad/html-css-js-mole-game.git
+---
 
-2. Open the project folder and open `index.html` in your browser:
+## Features
 
-   - Double-click `index.html` or
-   - Serve the folder with a static server (recommended to avoid some browser asset restrictions):
+- Vanilla HTML, CSS and JavaScript — no build tools or dependencies
+- 3×3 clickable board (9 tiles)
+- Moles spawn every second; plants spawn every two seconds
+- Score increments by 10 when a mole is whacked
+- Clicking a plant reduces a life; game ends when lives reach 0 or time runs out
+- High score persisted to `localStorage`
+- Restart button to play again
 
-     npx http-server .
+---
 
-## Controls
+## Controls / How to play
 
-- Click a tile to interact.
-  - Clicking a mole: +10 points
-  - Clicking a plant: -1 life
-- Click the "Restart Game" button to reset score, lives, and timer
+- Click a tile to interact:
+  - Click a mole: +10 points
+  - Click a piranha plant: -1 life
+- Click the **Restart Game** button to reset the game
 
-## Game rules / values
+---
 
-- Starting lives: 3
-- Starting time: 30 seconds
-- Mole spawn interval: 1 second
-- Plant spawn interval: 2 seconds
-- Points per mole: 10
+## Game configuration
 
-These values are defined in `js/script.js` and can be adjusted there.
+The basic gameplay values are defined in `js/script.js`. You can change them to adjust difficulty.
+
+Example of the main variables:
+
+```javascript
+let score = 0;
+let lives = 3;      // starting lives
+let time = 30;     // starting time in seconds
+
+// spawn intervals (milliseconds)
+let moleInterval = setInterval(setMole, 1000);   // mole every 1s
+let plantInterval = setInterval(setPlant, 2000); // plant every 2s
+```
+
+Adjust `lives`, `time`, and the intervals to change the game's difficulty.
+
+---
 
 ## Project structure
 
-- index.html — game HTML
-- css/style.css — game styles
-- js/script.js — game logic
+- index.html — game markup
+- css/style.css — styles and layout
+- js/script.js — game logic and timers
 - assets/ — images used by the game (mole, plant, background, pipes, soil)
 
-Important asset filenames used by the project (place them in `assets/`):
+Important asset filenames referenced by the code (place these in `assets/`):
 
-- monty-mole.png
-- piranha-plant.png
-- mario-bg.jpg
-- soil.png
-- pipe.png
+- `monty-mole.png`
+- `piranha-plant.png`
+- `mario-bg.jpg`
+- `soil.png`
+- `pipe.png`
+
+---
+
+## Development notes
+
+- The game uses DOM manipulation and `setInterval` timers to show/hide moles and plants and to count down the game time.
+- High score is stored under the `highScore` key in the browser `localStorage`.
+- The `js/script.js` file contains comments in Azerbaijani describing each function — these comments do not affect runtime.
+
+Tips:
+- To debug visually, open DevTools and inspect the `#board` element — each tile is a child `div` with id `0`..`8`.
+- If images do not appear, verify that the `assets/` folder is present and the filenames match exactly.
+
+---
+
+## Accessibility & improvements (ideas)
+
+- Add keyboard controls so the game is playable without a mouse
+- Add ARIA labels for screen readers
+- Add sound effects and visual hit/feedback
+- Add difficulty levels or progressively faster spawn rates
+- Add unit tests and CI (GitHub Actions) for repository health checks
+
+---
 
 ## Contributing
 
-Contributions are welcome. Feel free to open issues or submit pull requests to add features, fix bugs, or improve the UI.
+Contributions are welcome. Suggestions:
 
-Ideas:
+- Open issues for bugs or feature requests
+- Submit pull requests for improvements (code, assets, README)
 
-- Add levels or difficulty scaling
-- Improve accessibility (keyboard controls, ARIA attributes)
-- Add sound effects and animations
+When submitting PRs, keep changes small and include screenshots or recordings for visual changes.
 
-## Notes
-
-- High score is stored in the browser's `localStorage` under the `highScore` key.
-- The game is intentionally small and dependency-free — it's great for learning DOM manipulation and timers.
+---
 
 ## License
 
-This repository does not include a license file. If you want to add one, consider adding an MIT or other permissive license.
+No license is included in this repository. If you want to publish this project, consider adding an open-source license (for example, the MIT license). To add MIT, create a `LICENSE` file with the standard MIT text and update the repository README.
+
+---
 
 ## Author
 
