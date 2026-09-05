@@ -6,26 +6,30 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#ffd400" />
 
+        <!-- Title -->
         <title>Whack a Mole</title>
-
         <link rel="stylesheet" href="css/style.css" />
     </head>
-
     <body>
+        <!-- Main game -->
         <main class="game">
             <h1>Whack a Mole</h1>
 
+            <!-- Game info -->
             <div class="game-info">
                 <h2>Score: <span id="score">0</span></h2>
                 <h2>Lives: <span id="lives">3</span></h2>
                 <h2>Time: <span id="time">30</span></h2>
             </div>
 
+            <!-- Game board -->
             <div id="board" aria-label="Game board"></div>
 
+            <!-- Restart button -->
             <button id="restart" type="button">Restart Game</button>
         </main>
 
+        <!-- Game over modal -->
         <div class="modal" id="gameModal" aria-hidden="true">
             <div
                 class="modal-box"
@@ -34,18 +38,20 @@
                 aria-labelledby="modalTitle"
             >
                 <h2 id="modalTitle">Game Over</h2>
-
                 <p id="modalMessage">Time's up!</p>
 
+                <!-- Final score -->
                 <div class="modal-score">
                     <p>Score: <span id="modalScore">0</span></p>
                     <p>High Score: <span id="modalHighScore">0</span></p>
                 </div>
 
+                <!-- Play again button -->
                 <button id="modalRestart" type="button">Play Again</button>
             </div>
         </div>
 
+        <!-- JavaScript -->
         <script src="js/script.js"></script>
     </body>
 </html>

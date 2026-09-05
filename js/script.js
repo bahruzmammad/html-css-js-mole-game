@@ -1,21 +1,23 @@
+// Game state
 let currMoleTile = null;
 let currPlantTile = null;
-
 let score = 0;
 let lives = 3;
 let time = 30;
-
 let gameOver = false;
 let paused = false;
 
+// Game intervals
 let moleInterval = null;
 let plantInterval = null;
 let timerInterval = null;
 let difficultyInterval = null;
 
+// Difficulty
 let moleDelay = 1000;
 let plantDelay = 2000;
 
+// Game statistics
 let molesHit = 0;
 let plantsHit = 0;
 let missedMoles = 0;
@@ -23,76 +25,67 @@ let totalClicks = 0;
 let currentStreak = 0;
 let bestStreak = 0;
 
+// Saved scores
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 let bestAccuracy = Number(localStorage.getItem("bestAccuracy")) || 0;
 
+// Audio
 let audioContext = null;
 
+// DOM elements
 const board = document.getElementById("board");
 const scoreElement = document.getElementById("score");
 const livesElement = document.getElementById("lives");
 const timeElement = document.getElementById("time");
-
 const restartButton = document.getElementById("restart");
-
 let gameModal = document.getElementById("gameModal");
 let modalTitle = document.getElementById("modalTitle");
 let modalMessage = document.getElementById("modalMessage");
 let modalScore = document.getElementById("modalScore");
 let modalHighScore = document.getElementById("modalHighScore");
 let modalRestart = document.getElementById("modalRestart");
-
 let pauseButton = null;
 
+// Event listeners
 window.addEventListener("load", startGame);
-
 restartButton?.addEventListener("click", restartGame);
-
 modalRestart?.addEventListener("click", restartGame);
-
 document.addEventListener("keydown", handleKeyboard);
 
+// Start game
 function startGame() {
   clearGameIntervals();
-
   score = 0;
   lives = 3;
   time = 30;
-
   gameOver = false;
   paused = false;
-
   moleDelay = 1000;
   plantDelay = 2000;
-
   molesHit = 0;
   plantsHit = 0;
   missedMoles = 0;
   totalClicks = 0;
   currentStreak = 0;
   bestStreak = 0;
-
   currMoleTile = null;
   currPlantTile = null;
-
   closeModal();
   clearTiles();
   createBoard();
   createPauseButton();
-
   updateScore();
   updateLives();
   updateTime();
   updatePauseButton();
-
   moleInterval = setInterval(setMole, moleDelay);
   plantInterval = setInterval(setPlant, plantDelay);
   timerInterval = setInterval(updateTimer, 1000);
   difficultyInterval = setInterval(increaseDifficulty, 5000);
-
   setMole();
 }
 
+// Create game board
 function createBoard() {
   board.innerHTML = "";
 
@@ -103,7 +96,6 @@ function createBoard() {
     tile.tabIndex = 0;
     tile.setAttribute("role", "button");
     tile.setAttribute("aria-label", `Game tile ${i + 1}`);
-
     tile.addEventListener("click", selectTile);
     tile.addEventListener("keydown", handleTileKeyboard);
 
@@ -111,26 +103,27 @@ function createBoard() {
   }
 }
 
+// Create pause button
 function createPauseButton() {
   if (pauseButton) {
     pauseButton.remove();
   }
 
   pauseButton = document.createElement("button");
-
   pauseButton.id = "pause";
   pauseButton.type = "button";
   pauseButton.textContent = "Pause Game";
-
   pauseButton.addEventListener("click", togglePause);
 
   restartButton.parentNode.insertBefore(pauseButton, restartButton);
 }
 
+// Get random tile
 function getRandomTile() {
   return Math.floor(Math.random() * 9).toString();
 }
 
+// Spawn mole
 function setMole() {
   if (gameOver || paused) {
     return;
@@ -159,17 +152,16 @@ function setMole() {
   }
 
   const mole = document.createElement("img");
-
   mole.src = "assets/monty-mole.png";
   mole.alt = "Mole";
 
   tile.appendChild(mole);
-
   currMoleTile = tile;
 
   animateTile(tile);
 }
 
+// Spawn plant
 function setPlant() {
   if (gameOver || paused) {
     return;
@@ -198,17 +190,16 @@ function setPlant() {
   }
 
   const plant = document.createElement("img");
-
   plant.src = "assets/piranha-plant.png";
   plant.alt = "Piranha plant";
 
   tile.appendChild(plant);
-
   currPlantTile = tile;
 
   animateTile(tile);
 }
 
+// Handle tile click
 function selectTile(event) {
   if (gameOver || paused) {
     return;
@@ -222,16 +213,13 @@ function selectTile(event) {
 
   if (clickedTile === currMoleTile) {
     score += 10;
-
     molesHit++;
     currentStreak++;
     bestStreak = Math.max(bestStreak, currentStreak);
 
     updateScore();
-
     playHitSound();
     showHitFeedback(clickedTile, "+10");
-
     clearMoleTile();
 
     return;
@@ -239,15 +227,12 @@ function selectTile(event) {
 
   if (clickedTile === currPlantTile) {
     lives--;
-
     plantsHit++;
     currentStreak = 0;
 
     updateLives();
-
     playPlantSound();
     showHitFeedback(clickedTile, "-1");
-
     clearPlantTile();
 
     if (lives <= 0) {
@@ -264,6 +249,7 @@ function selectTile(event) {
   showHitFeedback(clickedTile, "MISS");
 }
 
+// Keyboard controls
 function handleKeyboard(event) {
   if (gameOver) {
     return;
@@ -272,11 +258,13 @@ function handleKeyboard(event) {
   if (event.key === " " || event.key.toLowerCase() === "p") {
     event.preventDefault();
     togglePause();
+
     return;
   }
 
   if (event.key === "r" || event.key === "R") {
     restartGame();
+
     return;
   }
 
@@ -303,11 +291,11 @@ function handleKeyboard(event) {
     ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)
   ) {
     event.preventDefault();
-
     moveFocus(event.key);
   }
 }
 
+// Tile keyboard controls
 function handleTileKeyboard(event) {
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
@@ -315,6 +303,7 @@ function handleTileKeyboard(event) {
   }
 }
 
+// Move tile focus
 function moveFocus(direction) {
   const currentTile = document.activeElement;
 
@@ -323,7 +312,6 @@ function moveFocus(direction) {
   }
 
   const currentIndex = Number(currentTile.id);
-
   let nextIndex = currentIndex;
 
   if (direction === "ArrowUp" && currentIndex >= 3) {
@@ -349,25 +337,28 @@ function moveFocus(direction) {
   }
 }
 
+// Update score
 function updateScore() {
   scoreElement.textContent = score;
 }
 
+// Update lives
 function updateLives() {
   livesElement.textContent = lives;
 }
 
+// Update time
 function updateTime() {
   timeElement.textContent = time;
 }
 
+// Update timer
 function updateTimer() {
   if (gameOver || paused) {
     return;
   }
 
   time--;
-
   updateTime();
 
   if (time <= 0) {
@@ -375,6 +366,7 @@ function updateTimer() {
   }
 }
 
+// Increase difficulty
 function increaseDifficulty() {
   if (gameOver || paused) {
     return;
@@ -386,6 +378,7 @@ function increaseDifficulty() {
   restartSpawnIntervals();
 }
 
+// Restart spawn intervals
 function restartSpawnIntervals() {
   clearInterval(moleInterval);
   clearInterval(plantInterval);
@@ -394,6 +387,7 @@ function restartSpawnIntervals() {
   plantInterval = setInterval(setPlant, plantDelay);
 }
 
+// Pause or resume game
 function togglePause() {
   if (gameOver) {
     return;
@@ -410,6 +404,7 @@ function togglePause() {
   }
 }
 
+// Update pause button
 function updatePauseButton() {
   if (!pauseButton) {
     return;
@@ -419,6 +414,7 @@ function updatePauseButton() {
   pauseButton.setAttribute("aria-pressed", String(paused));
 }
 
+// End game
 function endGame(message) {
   if (gameOver) {
     return;
@@ -443,17 +439,16 @@ function endGame(message) {
   }
 
   playGameOverSound();
-
   showModal(message, accuracy);
 }
 
+// Show game over modal
 function showModal(message, accuracy) {
   if (!gameModal) {
     createModal();
   }
 
   modalTitle.textContent = message;
-
   modalMessage.textContent =
     message === "Time's Up"
       ? "The timer has reached zero."
@@ -471,7 +466,6 @@ function showModal(message, accuracy) {
   const stats = document.createElement("div");
 
   stats.className = "modal-stats";
-
   stats.innerHTML = `
         <p>Moles Hit: <span>${molesHit}</span></p>
         <p>Plants Hit: <span>${plantsHit}</span></p>
@@ -488,6 +482,7 @@ function showModal(message, accuracy) {
   modalRestart.focus();
 }
 
+// Create modal if needed
 function createModal() {
   gameModal = document.createElement("div");
 
@@ -499,15 +494,11 @@ function createModal() {
         <div class="modal-box" role="dialog" aria-modal="true">
             <h2 id="modalTitle">Game Over</h2>
             <p id="modalMessage"></p>
-
             <div class="modal-score">
                 <p>Score: <span id="modalScore">0</span></p>
                 <p>High Score: <span id="modalHighScore">0</span></p>
             </div>
-
-            <button id="modalRestart" type="button">
-                Play Again
-            </button>
+            <button id="modalRestart" type="button">Play Again</button>
         </div>
     `;
 
@@ -522,6 +513,7 @@ function createModal() {
   modalRestart.addEventListener("click", restartGame);
 }
 
+// Close modal
 function closeModal() {
   if (!gameModal) {
     return;
@@ -531,11 +523,13 @@ function closeModal() {
   gameModal.setAttribute("aria-hidden", "true");
 }
 
+// Restart game
 function restartGame() {
   clearGameIntervals();
   startGame();
 }
 
+// Clear all intervals
 function clearGameIntervals() {
   clearInterval(moleInterval);
   clearInterval(plantInterval);
@@ -548,6 +542,7 @@ function clearGameIntervals() {
   difficultyInterval = null;
 }
 
+// Clear mole tile
 function clearMoleTile() {
   if (!currMoleTile) {
     return;
@@ -557,6 +552,7 @@ function clearMoleTile() {
   currMoleTile = null;
 }
 
+// Clear plant tile
 function clearPlantTile() {
   if (!currPlantTile) {
     return;
@@ -566,6 +562,7 @@ function clearPlantTile() {
   currPlantTile = null;
 }
 
+// Clear board
 function clearTiles() {
   clearMoleTile();
   clearPlantTile();
@@ -575,6 +572,7 @@ function clearTiles() {
   });
 }
 
+// Animate tile
 function animateTile(tile) {
   if (!tile.animate) {
     return;
@@ -596,11 +594,11 @@ function animateTile(tile) {
   );
 }
 
+// Show hit feedback
 function showHitFeedback(tile, text) {
   const feedback = document.createElement("span");
 
   feedback.textContent = text;
-
   feedback.style.position = "absolute";
   feedback.style.left = "50%";
   feedback.style.top = "50%";
@@ -640,6 +638,7 @@ function showHitFeedback(tile, text) {
     });
 }
 
+// Calculate accuracy
 function calculateAccuracy() {
   if (totalClicks === 0) {
     return 0;
@@ -648,6 +647,7 @@ function calculateAccuracy() {
   return Math.round((molesHit / totalClicks) * 100);
 }
 
+// Initialize audio
 function initializeAudio() {
   if (!audioContext) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -664,6 +664,7 @@ function initializeAudio() {
   }
 }
 
+// Create sound tone
 function createTone(frequency, duration, type = "sine", volume = 0.04) {
   if (!audioContext) {
     return;
@@ -688,27 +689,24 @@ function createTone(frequency, duration, type = "sine", volume = 0.04) {
   oscillator.stop(audioContext.currentTime + duration);
 }
 
+// Game sounds
 function playHitSound() {
   initializeAudio();
-
   createTone(700, 0.08, "square", 0.04);
 }
 
 function playPlantSound() {
   initializeAudio();
-
   createTone(180, 0.15, "sawtooth", 0.05);
 }
 
 function playMissSound() {
   initializeAudio();
-
   createTone(120, 0.08, "triangle", 0.025);
 }
 
 function playGameOverSound() {
   initializeAudio();
-
   createTone(260, 0.12, "sine", 0.04);
 
   setTimeout(() => {
@@ -716,6 +714,7 @@ function playGameOverSound() {
   }, 120);
 }
 
+// Pause audio
 function pauseAudio() {
   if (!audioContext) {
     return;

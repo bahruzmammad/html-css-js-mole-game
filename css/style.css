@@ -1,9 +1,11 @@
+/* Reset */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* Page */
 html {
     min-width: 320px;
     min-height: 100%;
@@ -13,15 +15,13 @@ body {
     min-width: 320px;
     min-height: 100vh;
     padding: 20px 12px 30px;
-
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
-
     background: url("../assets/mario-bg.jpg") center / cover no-repeat fixed;
-
     overflow-x: hidden;
 }
 
+/* Game */
 .game {
     width: 100%;
     max-width: 620px;
@@ -34,10 +34,10 @@ h1 {
     line-height: 1.1;
 }
 
+/* Game info */
 .game-info {
     width: 100%;
     margin: 0 auto;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,34 +51,27 @@ h1 {
     line-height: 1.2;
 }
 
+/* Game board */
 #board {
     width: min(540px, calc(100vw - 32px));
     aspect-ratio: 1 / 1;
-
     margin: 20px auto;
-
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-
     background: url("../assets/soil.png") center / cover no-repeat;
-
     border: clamp(2px, 0.6vw, 3px) solid white;
     border-radius: clamp(14px, 4vw, 25px);
-
     overflow: hidden;
 }
 
 #board div {
     width: 100%;
     height: 100%;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     background: url("../assets/pipe.png") center / cover no-repeat;
-
     cursor: pointer;
     touch-action: manipulation;
 }
@@ -86,36 +79,27 @@ h1 {
 #board div img {
     width: 55%;
     height: 55%;
-
     object-fit: contain;
-
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -webkit-user-drag: none;
-
     pointer-events: none;
 }
 
+/* Buttons */
 #restart,
-#modalRestart {
-    width: min(220px, 100%);
+#modalRestart,
+#pause {
     min-height: 44px;
-
     padding: 11px 22px;
-
     font-size: clamp(15px, 3vw, 18px);
     font-weight: bold;
-
     color: #000;
-
     background: #ffd400;
-
     border: 2px solid #e0ad00;
     border-radius: 10px;
-
     cursor: pointer;
-
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
@@ -123,44 +107,49 @@ h1 {
         box-shadow 0.2s ease;
 }
 
+#restart,
+#modalRestart {
+    width: min(220px, 100%);
+}
+
+#pause {
+    margin: 10px 8px 0;
+}
+
 #restart:hover,
-#modalRestart:hover {
+#modalRestart:hover,
+#pause:hover {
     background: #ff8c00;
     border-color: #e07800;
-
     transform: translateY(-2px);
-
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 #restart:active,
-#modalRestart:active {
+#modalRestart:active,
+#pause:active {
     background: #e07800;
-
     transform: translateY(0);
-
     box-shadow: none;
 }
 
 #restart:focus-visible,
-#modalRestart:focus-visible {
+#modalRestart:focus-visible,
+#pause:focus-visible {
     outline: 3px solid white;
     outline-offset: 3px;
 }
 
+/* Game over modal */
 .modal {
     position: fixed;
     inset: 0;
     z-index: 1000;
-
     padding: 20px;
-
     display: none;
     justify-content: center;
     align-items: center;
-
     background: rgba(0, 0, 0, 0.55);
-
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
@@ -172,65 +161,68 @@ h1 {
 .modal-box {
     width: min(360px, 100%);
     padding: 28px 22px;
-
     text-align: center;
-
     background: #fff8d6;
-
     border: 3px solid #ffb000;
     border-radius: 18px;
-
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
-
     animation: modalShow 0.2s ease;
 }
 
 .modal-box h2 {
     margin-bottom: 8px;
-
     font-size: clamp(24px, 6vw, 32px);
     color: #e07800;
 }
 
 #modalMessage {
     margin-bottom: 18px;
-
     color: #333;
     font-size: 17px;
     font-weight: 600;
 }
 
+/* Modal statistics */
 .modal-score {
     margin-bottom: 22px;
-
     display: flex;
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
 }
 
-.modal-score p {
+.modal-score p,
+.modal-stats p {
     font-size: 15px;
     color: #555;
 }
 
-.modal-score span {
+.modal-score span,
+.modal-stats span {
     color: #000;
     font-weight: bold;
 }
 
+.modal-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+    margin: 0 0 22px;
+}
+
+/* Modal animation */
 @keyframes modalShow {
     from {
         opacity: 0;
         transform: scale(0.95);
     }
-
     to {
         opacity: 1;
         transform: scale(1);
     }
 }
 
+/* Tablet and mobile */
 @media (max-width: 600px) {
     body {
         padding: 16px 10px 24px;
@@ -283,8 +275,13 @@ h1 {
         height: 52%;
     }
 
-    #restart {
+    #restart,
+    #pause {
         width: min(200px, 90%);
+    }
+
+    #pause {
+        margin: 8px auto 0;
     }
 
     .modal {
@@ -298,6 +295,11 @@ h1 {
 
     .modal-score {
         gap: 10px 18px;
+    }
+
+    .modal-stats {
+        grid-template-columns: 1fr;
+        gap: 7px;
     }
 }
 
@@ -325,7 +327,8 @@ h1 {
         height: 50%;
     }
 
-    #restart {
+    #restart,
+    #pause {
         width: 180px;
         font-size: 15px;
     }
@@ -339,9 +342,11 @@ h1 {
     }
 }
 
+/* Touch devices */
 @media (hover: none) {
     #restart:hover,
-    #modalRestart:hover {
+    #modalRestart:hover,
+    #pause:hover {
         background: #ffd400;
         border-color: #e0ad00;
         transform: none;
@@ -349,6 +354,7 @@ h1 {
     }
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -356,83 +362,5 @@ h1 {
         scroll-behavior: auto !important;
         animation: none !important;
         transition: none !important;
-    }
-}
-#pause {
-    margin: 10px 8px 0;
-    padding: 11px 22px;
-    min-height: 44px;
-
-    font-size: clamp(15px, 3vw, 18px);
-    font-weight: bold;
-
-    color: #000;
-    background: #ffd400;
-
-    border: 2px solid #e0ad00;
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-#pause:hover {
-    background: #ff8c00;
-    border-color: #e07800;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-#pause:active {
-    background: #e07800;
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-#pause:focus-visible {
-    outline: 3px solid white;
-    outline-offset: 3px;
-}
-
-.modal-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px 16px;
-    margin: 0 0 22px;
-}
-
-.modal-stats p {
-    font-size: 14px;
-    color: #555;
-}
-
-.modal-stats span {
-    color: #000;
-    font-weight: bold;
-}
-
-@media (max-width: 420px) {
-    #pause {
-        width: min(200px, 90%);
-        margin: 8px auto 0;
-    }
-
-    .modal-stats {
-        grid-template-columns: 1fr;
-        gap: 7px;
-    }
-}
-
-@media (hover: none) {
-    #pause:hover {
-        background: #ffd400;
-        border-color: #e0ad00;
-        transform: none;
-        box-shadow: none;
     }
 }
