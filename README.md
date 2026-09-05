@@ -108,15 +108,3 @@ Contributions are welcome. Suggestions:
 - Submit pull requests for improvements (code, assets, README)
 
 When submitting PRs, keep changes small and include screenshots or recordings for visual changes.
-
----
-
-## License
-
-No license is included in this repository. If you want to publish this project, consider adding an open-source license (for example, the MIT license). To add MIT, create a `LICENSE` file with the standard MIT text and update the repository README.
-
----
-
-## Author
-
-bahruzmammad
