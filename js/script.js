@@ -1,3 +1,34 @@
+/*
+  js/script.js
+
+  Bu fayl "Whack a Mole" oyununun əsas loqikasını ehtiva edir.
+  Aşağıdakı dəyişənlər və funksiyalar oyunun işləməsi üçün vacibdir:
+
+  Dəyişənlər:
+  - currMoleTile, currPlantTile: hazırda mədə (mole) və bitkinin yerləşdiyi DOM elementi
+  - score, lives, time: oyun göstəriciləri
+  - gameOver: oyunun bitib-bitmədiyini bildirir
+  - moleInterval, plantInterval, timerInterval: setInterval üçün handlerlər
+  - highScore: brauzerin localStorage-dan alınan yüksək bal
+
+  Əsas funksiyalar:
+  - startGame(): oyun vəziyyətini sıfırlayır və interval-ları başladır
+  - createBoard(): 3x3 (9 hüceyrə) DOM lövhəsini yaradır
+  - setMole(), setPlant(): təsadüfi hüceyrədə mole/plant göstərir
+  - selectTile(): istifadəçi kliklədikdə işləyən funksiya — mole/plant aşkarlanıb müvafiq reaksiya
+  - updateScore(), updateLives(), updateTime(): HTML elementlərini yeniləyir
+  - updateTimer(): saniyə sayını azaldır və vaxt bitdikdə oyunu bitirir
+  - endGame(): oyunu dayandırır, high score-u saxlayır və istifadəçiyə xəbərdarlıq göstərir
+  - restartGame(): oyun yenidən başlayır
+  - clearGameIntervals(): bütün interval-ları təmizləyir
+
+  İzah (qısa):
+  - Oyun yüklənəndə startGame() çağırılır. O, lövhəni yaradır, göstəriciləri sıfırlayır
+    və mole/plant üçün interval-ları təyin edir. Kullanıcı bir hüceyrəni kliklədikdə
+    selectTile() yoxlayır ki, kliklənən hüceyrədə mole var (xal əlavə olunur) yoxsa plant var
+    (həyat azalır). Vaxt və ya həyat tükənəndə endGame() çağırılır.
+*/
+
 let currMoleTile = null;
 let currPlantTile = null;
 
@@ -13,11 +44,13 @@ let timerInterval;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 
 window.addEventListener("load", function () {
+  // Yenidən başlama düyməsini bağlayırıq və oyunu start edirik
   document.getElementById("restart").addEventListener("click", restartGame);
 
   startGame();
 });
 
+// Oyunu başlanğıc vəziyyətinə gətirir
 function startGame() {
   score = 0;
   lives = 3;
@@ -35,21 +68,21 @@ function startGame() {
 
   clearGameIntervals();
 
-  // Start mole and plant
-  moleInterval = setInterval(setMole, 1000);
-  plantInterval = setInterval(setPlant, 2000);
+  // Mole və plant üçün interval-ları təyin edirik
+  moleInterval = setInterval(setMole, 1000); // hər 1 saniyədə mole
+  plantInterval = setInterval(setPlant, 2000); // hər 2 saniyədə plant
 
-  // Start timer
+  // Vaxt sayacı
   timerInterval = setInterval(updateTimer, 1000);
 
-  // Show mole immediately
+  // Oyuna dərhal mole göstər
   setMole();
 }
 
 /* =========================
    CREATE BOARD
-========================= */
-
+   3x3 grid — hər hüceyrə click event-ə bağlanır
+   ========================= */
 function createBoard() {
   const board = document.getElementById("board");
 
@@ -60,7 +93,7 @@ function createBoard() {
 
     tile.id = i.toString();
 
-    // Important: click event
+    // Klik hadisəsi — istifadəçi hüceyrəni vurduqda selectTile işləyir
     tile.addEventListener("click", selectTile);
 
     board.appendChild(tile);
@@ -69,8 +102,8 @@ function createBoard() {
 
 /* =========================
    RANDOM TILE
-========================= */
-
+   0-8 arası təsadüfi nömrə qaytarır
+   ========================= */
 function getRandomTile() {
   const number = Math.floor(Math.random() * 9);
 
@@ -79,14 +112,15 @@ function getRandomTile() {
 
 /* =========================
    MOLE
-========================= */
-
+   Mövcud mole-i silib yeni hüceyrədə mole göstərir
+   Əgər həmin hüceyrədə plant varsa, mole yerləşdirmir (toqquşma önlənir)
+   ========================= */
 function setMole() {
   if (gameOver) {
     return;
   }
 
-  // Remove old mole
+  // Köhnə mole-i sil
   if (currMoleTile) {
     currMoleTile.innerHTML = "";
     currMoleTile = null;
@@ -94,7 +128,7 @@ function setMole() {
 
   let randomTile = getRandomTile();
 
-  // Don't put mole on plant
+  // Mole-i plant olan hüceyrəyə qoyma
   if (currPlantTile && currPlantTile.id === randomTile) {
     return;
   }
@@ -107,6 +141,7 @@ function setMole() {
 
   const mole = document.createElement("img");
 
+  // DİQQƏT: js faylı "js/" qovluğunda olduğu üçün assets yolu ../assets/ olaraq qalmalıdır
   mole.src = "../assets/monty-mole.png";
   mole.alt = "Mole";
 
@@ -117,14 +152,14 @@ function setMole() {
 
 /* =========================
    PLANT
-========================= */
-
+   Plant də eyni şəkildə göstərilir; mole ilə toqquşmaya icazə verilmir
+   ========================= */
 function setPlant() {
   if (gameOver) {
     return;
   }
 
-  // Remove old plant
+  // Köhnə plant-i sil
   if (currPlantTile) {
     currPlantTile.innerHTML = "";
     currPlantTile = null;
@@ -132,7 +167,7 @@ function setPlant() {
 
   let randomTile = getRandomTile();
 
-  // Don't put plant on mole
+  // Plant-i mole olan hüceyrəyə qoyma
   if (currMoleTile && currMoleTile.id === randomTile) {
     return;
   }
@@ -155,8 +190,10 @@ function setPlant() {
 
 /* =========================
    CLICK TILE
-========================= */
-
+   İstifadəçi hüceyrəni kliklədikdə burada yoxlanılır:
+   - Mole kliklənibsə score artırılır və mole silinir
+   - Plant kliklənibsə lives azalır və plant silinir
+   ========================= */
 function selectTile(event) {
   if (gameOver) {
     return;
@@ -164,10 +201,7 @@ function selectTile(event) {
 
   const clickedTile = event.currentTarget;
 
-  /*
-        Mole clicked
-    */
-
+  // Mole kliklənmişsə
   if (clickedTile === currMoleTile) {
     score += 10;
 
@@ -180,10 +214,7 @@ function selectTile(event) {
     return;
   }
 
-  /*
-        Plant clicked
-    */
-
+  // Plant kliklənmişsə
   if (clickedTile === currPlantTile) {
     lives--;
 
@@ -202,9 +233,9 @@ function selectTile(event) {
 }
 
 /* =========================
-   SCORE
-========================= */
-
+   SCORE / LIVES / TIMER helpers
+   DOM elementlərini yeniləyir
+   ========================= */
 function updateScore() {
   const scoreElement = document.getElementById("score");
 
@@ -213,10 +244,6 @@ function updateScore() {
   }
 }
 
-/* =========================
-   LIVES
-========================= */
-
 function updateLives() {
   const livesElement = document.getElementById("lives");
 
@@ -224,10 +251,6 @@ function updateLives() {
     livesElement.innerText = lives;
   }
 }
-
-/* =========================
-   TIMER
-========================= */
 
 function updateTime() {
   const timeElement = document.getElementById("time");
@@ -239,8 +262,8 @@ function updateTime() {
 
 /* =========================
    TIMER COUNTDOWN
-========================= */
-
+   Hər saniyə çağırılır; vaxt 0-a çatdıqda oyunu bitirir
+   ========================= */
 function updateTimer() {
   if (gameOver) {
     return;
@@ -257,8 +280,8 @@ function updateTimer() {
 
 /* =========================
    END GAME
-========================= */
-
+   Oyun bitdikdə interval-ları təmizləyir, obyektləri silir və high score-u saxlayır
+   ========================= */
 function endGame(message) {
   if (gameOver) {
     return;
@@ -268,19 +291,19 @@ function endGame(message) {
 
   clearGameIntervals();
 
-  // Remove mole
+  // Mole-i sil
   if (currMoleTile) {
     currMoleTile.innerHTML = "";
     currMoleTile = null;
   }
 
-  // Remove plant
+  // Plant-i sil
   if (currPlantTile) {
     currPlantTile.innerHTML = "";
     currPlantTile = null;
   }
 
-  // Save high score
+  // Yüksək balı yadda saxla
   if (score > highScore) {
     highScore = score;
 
@@ -298,8 +321,8 @@ function endGame(message) {
 
 /* =========================
    RESTART GAME
-========================= */
-
+   Restart düyməsi ilə çağırılır: interval-ları təmizləyir və oyunu yenidən başlayır
+   ========================= */
 function restartGame() {
   clearGameIntervals();
 
@@ -308,8 +331,8 @@ function restartGame() {
 
 /* =========================
    CLEAR INTERVALS
-========================= */
-
+   setInterval-lərlə yaradılmış handler-ları dayandırır
+   ========================= */
 function clearGameIntervals() {
   clearInterval(moleInterval);
   clearInterval(plantInterval);
