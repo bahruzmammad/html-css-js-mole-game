@@ -1,6 +1,6 @@
 # Whack-a-Mole
 
-A small, dependency-free browser game built with HTML, CSS and JavaScript. Click moles to score points and avoid piranha plants — the game tracks score, lives, a countdown timer, and saves the high score to localStorage.
+A small, dependency-free browser game built with HTML, CSS and JavaScript. Click moles to score points and avoid piranha plants the game tracks score, lives, a countdown timer, and saves the high score to localStorage.
 
 ---
 
@@ -22,7 +22,7 @@ npx http-server .
 
 ## Features
 
-- Vanilla HTML, CSS and JavaScript — no build tools or dependencies
+- HTML, CSS and JavaScript
 - 3×3 clickable board (9 tiles)
 - Moles spawn every second; plants spawn every two seconds
 - Score increments by 10 when a mole is whacked
@@ -84,27 +84,12 @@ Important asset filenames referenced by the code (place these in `assets/`):
 - High score is stored under the `highScore` key in the browser `localStorage`.
 - The `js/script.js` file contains comments in Azerbaijani describing each function — these comments do not affect runtime.
 
-Tips:
-- To debug visually, open DevTools and inspect the `#board` element — each tile is a child `div` with id `0`..`8`.
-- If images do not appear, verify that the `assets/` folder is present and the filenames match exactly.
-
 ---
 
-## Accessibility & improvements (ideas)
+## Accessibility & improvements (todos)
 
 - Add keyboard controls so the game is playable without a mouse
 - Add ARIA labels for screen readers
 - Add sound effects and visual hit/feedback
 - Add difficulty levels or progressively faster spawn rates
 - Add unit tests and CI (GitHub Actions) for repository health checks
-
----
-
-## Contributing
-
-Contributions are welcome. Suggestions:
-
-- Open issues for bugs or feature requests
-- Submit pull requests for improvements (code, assets, README)
-
-When submitting PRs, keep changes small and include screenshots or recordings for visual changes.
