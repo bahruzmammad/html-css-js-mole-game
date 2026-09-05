@@ -1,231 +1,360 @@
-let currMoleTile = null;
-let currPlantTile = null;
-
-let score = 0;
-let lives = 3;
-let time = 30;
-let gameOver = false;
-
-let moleInterval;
-let plantInterval;
-let timerInterval;
-
-let highScore = Number(localStorage.getItem("highScore")) || 0;
-
-window.addEventListener("load", function () {
-  document.getElementById("restart").addEventListener("click", restartGame);
-  startGame();
-});
-
-function startGame() {
-  score = 0;
-  lives = 3;
-  time = 30;
-  gameOver = false;
-
-  currMoleTile = null;
-  currPlantTile = null;
-
-  updateScore();
-  updateLives();
-  updateTime();
-
-  createBoard();
-
-  clearGameIntervals();
-
-  moleInterval = setInterval(setMole, 1000);
-  plantInterval = setInterval(setPlant, 2000);
-
-  timerInterval = setInterval(updateTimer, 1000);
-
-  setMole();
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-function createBoard() {
-  const board = document.getElementById("board");
-
-  board.innerHTML = "";
-
-  for (let i = 0; i < 9; i++) {
-    const tile = document.createElement("div");
-    tile.id = i.toString();
-    tile.addEventListener("click", selectTile);
-    board.appendChild(tile);
-  }
+html {
+    min-width: 320px;
+    min-height: 100%;
 }
 
-function getRandomTile() {
-  const number = Math.floor(Math.random() * 9);
-  return number.toString();
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    padding: 20px 12px 30px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+
+    background: url("../assets/mario-bg.jpg") center / cover no-repeat fixed;
+
+    overflow-x: hidden;
 }
 
-function setMole() {
-  if (gameOver) {
-    return;
-  }
-
-  if (currMoleTile) {
-    currMoleTile.innerHTML = "";
-    currMoleTile = null;
-  }
-
-  let randomTile = getRandomTile();
-
-  if (currPlantTile && currPlantTile.id === randomTile) {
-    return;
-  }
-
-  const tile = document.getElementById(randomTile);
-
-  if (!tile) {
-    return;
-  }
-
-  const mole = document.createElement("img");
-  mole.src = "../assets/monty-mole.png";
-  mole.alt = "Mole";
-
-  tile.appendChild(mole);
-
-  currMoleTile = tile;
+.game {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
 }
 
-function setPlant() {
-  if (gameOver) {
-    return;
-  }
-
-  if (currPlantTile) {
-    currPlantTile.innerHTML = "";
-    currPlantTile = null;
-  }
-
-  let randomTile = getRandomTile();
-
-  if (currMoleTile && currMoleTile.id === randomTile) {
-    return;
-  }
-
-  const tile = document.getElementById(randomTile);
-
-  if (!tile) {
-    return;
-  }
-
-  const plant = document.createElement("img");
-  plant.src = "../assets/piranha-plant.png";
-  plant.alt = "Plant";
-
-  tile.appendChild(plant);
-
-  currPlantTile = tile;
+h1 {
+    margin-bottom: 10px;
+    font-size: clamp(28px, 6vw, 42px);
+    line-height: 1.1;
 }
 
-function selectTile(event) {
-  if (gameOver) {
-    return;
-  }
+.game-info {
+    width: 100%;
+    margin: 0 auto;
 
-  const clickedTile = event.currentTarget;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 4vw, 30px);
+    flex-wrap: wrap;
+}
 
-  if (clickedTile === currMoleTile) {
-    score += 10;
-    updateScore();
-    clickedTile.innerHTML = "";
-    currMoleTile = null;
-    return;
-  }
+.game-info h2 {
+    margin: 8px 0;
+    font-size: clamp(17px, 4vw, 26px);
+    line-height: 1.2;
+}
 
-  if (clickedTile === currPlantTile) {
-    lives--;
-    updateLives();
-    clickedTile.innerHTML = "";
-    currPlantTile = null;
-    if (lives <= 0) {
-      endGame("GAME OVER");
+#board {
+    width: min(540px, calc(100vw - 32px));
+    aspect-ratio: 1 / 1;
+
+    margin: 20px auto;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+
+    background: url("../assets/soil.png") center / cover no-repeat;
+
+    border: clamp(2px, 0.6vw, 3px) solid white;
+    border-radius: clamp(14px, 4vw, 25px);
+
+    overflow: hidden;
+}
+
+#board div {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: url("../assets/pipe.png") center / cover no-repeat;
+
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+#board div img {
+    width: 55%;
+    height: 55%;
+
+    object-fit: contain;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+
+    pointer-events: none;
+}
+
+#restart,
+#modalRestart {
+    width: min(220px, 100%);
+    min-height: 44px;
+
+    padding: 11px 22px;
+
+    font-size: clamp(15px, 3vw, 18px);
+    font-weight: bold;
+
+    color: #000;
+
+    background: #ffd400;
+
+    border: 2px solid #e0ad00;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#restart:hover,
+#modalRestart:hover {
+    background: #ff8c00;
+    border-color: #e07800;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#restart:active,
+#modalRestart:active {
+    background: #e07800;
+
+    transform: translateY(0);
+
+    box-shadow: none;
+}
+
+#restart:focus-visible,
+#modalRestart:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 3px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    padding: 20px;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    width: min(360px, 100%);
+    padding: 28px 22px;
+
+    text-align: center;
+
+    background: #fff8d6;
+
+    border: 3px solid #ffb000;
+    border-radius: 18px;
+
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+
+    animation: modalShow 0.2s ease;
+}
+
+.modal-box h2 {
+    margin-bottom: 8px;
+
+    font-size: clamp(24px, 6vw, 32px);
+    color: #e07800;
+}
+
+#modalMessage {
+    margin-bottom: 18px;
+
+    color: #333;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.modal-score {
+    margin-bottom: 22px;
+
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.modal-score p {
+    font-size: 15px;
+    color: #555;
+}
+
+.modal-score span {
+    color: #000;
+    font-weight: bold;
+}
+
+@keyframes modalShow {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
     }
-    return;
-  }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-function updateScore() {
-  const scoreElement = document.getElementById("score");
-  if (scoreElement) {
-    scoreElement.innerText = score;
-  }
+@media (max-width: 600px) {
+    body {
+        padding: 16px 10px 24px;
+        background-attachment: scroll;
+    }
+
+    .game-info {
+        gap: 6px 18px;
+    }
+
+    .game-info h2 {
+        margin: 6px 0;
+    }
+
+    #board {
+        width: min(480px, calc(100vw - 28px));
+        margin: 16px auto;
+    }
+
+    #restart {
+        width: min(220px, 90%);
+    }
 }
 
-function updateLives() {
-  const livesElement = document.getElementById("lives");
-  if (livesElement) {
-    livesElement.innerText = lives;
-  }
+@media (max-width: 420px) {
+    body {
+        padding: 12px 8px 20px;
+    }
+
+    h1 {
+        margin-bottom: 6px;
+    }
+
+    .game-info {
+        gap: 4px 12px;
+    }
+
+    .game-info h2 {
+        font-size: 16px;
+    }
+
+    #board {
+        width: min(360px, calc(100vw - 20px));
+        margin: 14px auto;
+        border-radius: 16px;
+    }
+
+    #board div img {
+        width: 52%;
+        height: 52%;
+    }
+
+    #restart {
+        width: min(200px, 90%);
+    }
+
+    .modal {
+        padding: 14px;
+    }
+
+    .modal-box {
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
+
+    .modal-score {
+        gap: 10px 18px;
+    }
 }
 
-function updateTime() {
-  const timeElement = document.getElementById("time");
-  if (timeElement) {
-    timeElement.innerText = time;
-  }
+@media (max-width: 360px) {
+    body {
+        padding: 10px 6px 18px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .game-info h2 {
+        font-size: 15px;
+    }
+
+    #board {
+        width: min(320px, calc(100vw - 16px));
+        margin: 12px auto;
+        border-radius: 14px;
+    }
+
+    #board div img {
+        width: 50%;
+        height: 50%;
+    }
+
+    #restart {
+        width: 180px;
+        font-size: 15px;
+    }
+
+    .modal-box h2 {
+        font-size: 25px;
+    }
+
+    #modalMessage {
+        font-size: 16px;
+    }
 }
 
-function updateTimer() {
-  if (gameOver) {
-    return;
-  }
-
-  time--;
-  updateTime();
-
-  if (time <= 0) {
-    endGame("TIME'S UP");
-  }
+@media (hover: none) {
+    #restart:hover,
+    #modalRestart:hover {
+        background: #ffd400;
+        border-color: #e0ad00;
+        transform: none;
+        box-shadow: none;
+    }
 }
 
-function endGame(message) {
-  if (gameOver) {
-    return;
-  }
-
-  gameOver = true;
-
-  clearGameIntervals();
-
-  if (currMoleTile) {
-    currMoleTile.innerHTML = "";
-    currMoleTile = null;
-  }
-
-  if (currPlantTile) {
-    currPlantTile.innerHTML = "";
-    currPlantTile = null;
-  }
-
-  if (score > highScore) {
-    highScore = score;
-    localStorage.setItem("highScore", highScore);
-  }
-
-  const scoreElement = document.getElementById("score");
-  if (scoreElement) {
-    scoreElement.innerText = message + ": " + score;
-  }
-
-  alert(message + "\n\nScore: " + score + "\nHigh Score: " + highScore);
-}
-
-function restartGame() {
-  clearGameIntervals();
-  startGame();
-}
-
-function clearGameIntervals() {
-  clearInterval(moleInterval);
-  clearInterval(plantInterval);
-  clearInterval(timerInterval);
-
-  moleInterval = null;
-  plantInterval = null;
-  timerInterval = null;
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation: none !important;
+        transition: none !important;
+    }
 }

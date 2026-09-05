@@ -6,10 +6,10 @@
 
 html {
     min-width: 320px;
+    min-height: 100%;
 }
 
 body {
-    width: 100%;
     min-width: 320px;
     min-height: 100vh;
     padding: 20px 12px 30px;
@@ -18,37 +18,42 @@ body {
     text-align: center;
 
     background: url("../assets/mario-bg.jpg") center / cover no-repeat fixed;
+
+    overflow-x: hidden;
+}
+
+.game {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
 }
 
 h1 {
     margin-bottom: 10px;
-    font-size: clamp(28px, 5vw, 42px);
+    font-size: clamp(28px, 6vw, 42px);
+    line-height: 1.1;
 }
 
 .game-info {
-    width: min(100%, 600px);
+    width: 100%;
     margin: 0 auto;
 
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: clamp(12px, 4vw, 30px);
+    gap: clamp(8px, 4vw, 30px);
     flex-wrap: wrap;
 }
 
 .game-info h2 {
-    margin: 10px 0;
-    font-size: clamp(18px, 4vw, 26px);
+    margin: 8px 0;
+    font-size: clamp(17px, 4vw, 26px);
+    line-height: 1.2;
 }
 
 #board {
-    width: min(540px, 92vw);
-    height: min(540px, 92vw);
-
-    min-width: 280px;
-    min-height: 280px;
-    max-width: 540px;
-    max-height: 540px;
+    width: min(540px, calc(100vw - 32px));
+    aspect-ratio: 1 / 1;
 
     margin: 20px auto;
 
@@ -68,18 +73,19 @@ h1 {
     width: 100%;
     height: 100%;
 
-    background: url("../assets/pipe.png") center / cover no-repeat;
-
     display: flex;
     justify-content: center;
     align-items: center;
 
+    background: url("../assets/pipe.png") center / cover no-repeat;
+
     cursor: pointer;
+    touch-action: manipulation;
 }
 
 #board div img {
-    width: min(100px, 55%);
-    height: min(100px, 55%);
+    width: 55%;
+    height: 55%;
 
     object-fit: contain;
 
@@ -91,21 +97,19 @@ h1 {
     pointer-events: none;
 }
 
-#restart {
-    display: inline-block;
-
-    margin: 10px auto 0;
-    padding: 12px 28px;
-
-    min-width: 140px;
-    max-width: 100%;
+#restart,
+#modalRestart {
+    width: min(220px, 100%);
     min-height: 44px;
+
+    padding: 11px 22px;
 
     font-size: clamp(15px, 3vw, 18px);
     font-weight: bold;
 
     color: #000;
-    background-color: #ffd400;
+
+    background: #ffd400;
 
     border: 2px solid #e0ad00;
     border-radius: 10px;
@@ -119,8 +123,9 @@ h1 {
         box-shadow 0.2s ease;
 }
 
-#restart:hover {
-    background-color: #ff8c00;
+#restart:hover,
+#modalRestart:hover {
+    background: #ff8c00;
     border-color: #e07800;
 
     transform: translateY(-2px);
@@ -128,15 +133,102 @@ h1 {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-#restart:active {
-    background-color: #e07800;
+#restart:active,
+#modalRestart:active {
+    background: #e07800;
+
     transform: translateY(0);
+
     box-shadow: none;
 }
 
-#restart:focus-visible {
+#restart:focus-visible,
+#modalRestart:focus-visible {
     outline: 3px solid white;
     outline-offset: 3px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    padding: 20px;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    width: min(360px, 100%);
+    padding: 28px 22px;
+
+    text-align: center;
+
+    background: #fff8d6;
+
+    border: 3px solid #ffb000;
+    border-radius: 18px;
+
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+
+    animation: modalShow 0.2s ease;
+}
+
+.modal-box h2 {
+    margin-bottom: 8px;
+
+    font-size: clamp(24px, 6vw, 32px);
+    color: #e07800;
+}
+
+#modalMessage {
+    margin-bottom: 18px;
+
+    color: #333;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.modal-score {
+    margin-bottom: 22px;
+
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.modal-score p {
+    font-size: 15px;
+    color: #555;
+}
+
+.modal-score span {
+    color: #000;
+    font-weight: bold;
+}
+
+@keyframes modalShow {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @media (max-width: 600px) {
@@ -146,7 +238,7 @@ h1 {
     }
 
     .game-info {
-        gap: 8px 20px;
+        gap: 6px 18px;
     }
 
     .game-info h2 {
@@ -154,14 +246,12 @@ h1 {
     }
 
     #board {
-        width: min(92vw, 480px);
-        height: min(92vw, 480px);
+        width: min(480px, calc(100vw - 28px));
         margin: 16px auto;
     }
 
     #restart {
-        width: min(100%, 220px);
-        padding: 11px 20px;
+        width: min(220px, 90%);
     }
 }
 
@@ -175,39 +265,45 @@ h1 {
     }
 
     .game-info {
-        gap: 4px 14px;
+        gap: 4px 12px;
     }
 
     .game-info h2 {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     #board {
-        width: min(94vw, 360px);
-        height: min(94vw, 360px);
-
-        min-width: 260px;
-        min-height: 260px;
-
+        width: min(360px, calc(100vw - 20px));
         margin: 14px auto;
         border-radius: 16px;
     }
 
     #board div img {
-        width: 50%;
-        height: 50%;
+        width: 52%;
+        height: 52%;
     }
 
     #restart {
-        width: min(100%, 200px);
-        min-height: 42px;
-        padding: 10px 18px;
+        width: min(200px, 90%);
+    }
+
+    .modal {
+        padding: 14px;
+    }
+
+    .modal-box {
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
+
+    .modal-score {
+        gap: 10px 18px;
     }
 }
 
-@media (max-width: 320px) {
+@media (max-width: 360px) {
     body {
-        padding: 10px 6px 16px;
+        padding: 10px 6px 18px;
     }
 
     h1 {
@@ -219,30 +315,37 @@ h1 {
     }
 
     #board {
-        width: 280px;
-        height: 280px;
-        min-width: 280px;
-        min-height: 280px;
-
+        width: min(320px, calc(100vw - 16px));
         margin: 12px auto;
         border-radius: 14px;
+    }
+
+    #board div img {
+        width: 50%;
+        height: 50%;
     }
 
     #restart {
         width: 180px;
         font-size: 15px;
     }
-}
 
-@media (min-width: 768px) {
-    body {
-        padding-top: 30px;
+    .modal-box h2 {
+        font-size: 25px;
+    }
+
+    #modalMessage {
+        font-size: 16px;
     }
 }
 
-@media (min-width: 1200px) {
-    body {
-        padding-top: 40px;
+@media (hover: none) {
+    #restart:hover,
+    #modalRestart:hover {
+        background: #ffd400;
+        border-color: #e0ad00;
+        transform: none;
+        box-shadow: none;
     }
 }
 
@@ -251,15 +354,7 @@ h1 {
     *::before,
     *::after {
         scroll-behavior: auto !important;
+        animation: none !important;
         transition: none !important;
-    }
-}
-
-@media (hover: none) {
-    #restart:hover {
-        background-color: #ffd400;
-        border-color: #e0ad00;
-        transform: none;
-        box-shadow: none;
     }
 }
